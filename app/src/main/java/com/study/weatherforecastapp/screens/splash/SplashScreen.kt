@@ -1,4 +1,4 @@
-package com.study.weatherforecastapp.screens
+package com.study.weatherforecastapp.screens.splash
 
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable

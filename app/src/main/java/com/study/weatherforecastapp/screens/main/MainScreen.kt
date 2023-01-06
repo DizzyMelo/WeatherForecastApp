@@ -1,4 +1,4 @@
-package com.study.weatherforecastapp.screens
+package com.study.weatherforecastapp.screens.main
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
