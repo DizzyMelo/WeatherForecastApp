@@ -98,3 +98,8 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
 }
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
+}
