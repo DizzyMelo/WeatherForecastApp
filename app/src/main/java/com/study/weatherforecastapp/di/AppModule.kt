@@ -18,7 +18,7 @@ object AppModule {
     @Provides
     fun providesWeatherApi(): WeatherApi {
         return Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL)
+            .baseUrl(Constants.API_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(WeatherApi::class.java)
