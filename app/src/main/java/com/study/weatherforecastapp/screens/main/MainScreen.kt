@@ -9,19 +9,22 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.study.weatherforecastapp.R
 import com.study.weatherforecastapp.components.WeatherAppBar
 import com.study.weatherforecastapp.data.DataOrException
 import com.study.weatherforecastapp.model.Weather
+import com.study.weatherforecastapp.model.WeatherItem
 import com.study.weatherforecastapp.util.Constants
 import com.study.weatherforecastapp.util.formatDate
+import com.study.weatherforecastapp.util.formatDateTime
 import com.study.weatherforecastapp.util.formatDecimal
 
 @Composable
@@ -96,6 +99,10 @@ fun MainContent(weather: Weather) {
                 }
             
         }
+
+        HumidityWindPressureRow(weather = weatherItem)
+        Divider()
+        SunTimeRow(weather = weatherItem)
     }
 }
 
@@ -109,7 +116,59 @@ fun WeatherStateImage(icon: String) {
     )
 }
 
-@Preview
 @Composable
-fun MainScaffoldPreview() {
+fun HumidityWindPressureRow(weather: WeatherItem) {
+    Row(
+        modifier = Modifier
+            .padding(12.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        HWPItem(icon = R.drawable.humidity, amount = weather.humidity.toString(), unit = "%")
+        HWPItem(icon = R.drawable.pressure, amount = weather.pressure.toString(), unit = "psi")
+        HWPItem(icon = R.drawable.wind, amount = weather.speed.toString(), unit = " mph")
+    }
+}
+
+@Composable
+fun HWPItem(icon: Int, amount: String, unit: String) {
+    Row(modifier = Modifier.padding(4.dp)) {
+        Icon(painter = painterResource(id = icon), contentDescription = "HWP icon", modifier = Modifier.size(12.dp))
+        Text(text = "$amount$unit", style = MaterialTheme.typography.caption)
+    }
+}
+
+@Composable
+fun SunTimeRow(weather: WeatherItem) {
+    Row(
+        modifier = Modifier
+            .padding(12.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        SunTimeItem(icon = R.drawable.sunrise, time = formatDateTime(weather.sunrise))
+        SunTimeItem(icon = R.drawable.sunset, time = formatDateTime(weather.sunset), iconFirst = false)
+    }
+}
+
+@Composable
+fun SunTimeItem(icon: Int, time: String, iconFirst: Boolean = true) {
+    if (iconFirst) {
+        return Row(
+            modifier = Modifier.padding(4.dp),
+        ) {
+            Icon(painter = painterResource(id = icon), contentDescription = "Sun time icon", modifier = Modifier.size(25.dp))
+            Text(text = time, style = MaterialTheme.typography.caption)
+        }
+    }
+
+    Row(
+        modifier = Modifier.padding(4.dp),
+    ) {
+        Text(text = time, style = MaterialTheme.typography.caption)
+        Icon(painter = painterResource(id = icon), contentDescription = "Sun time icon", modifier = Modifier.size(25.dp).padding(4.dp))
+    }
+
 }
