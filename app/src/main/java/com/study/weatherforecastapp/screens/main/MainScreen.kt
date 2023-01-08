@@ -21,12 +21,14 @@ import com.study.weatherforecastapp.components.WeatherAppBar
 import com.study.weatherforecastapp.data.DataOrException
 import com.study.weatherforecastapp.model.Weather
 import com.study.weatherforecastapp.util.Constants
+import com.study.weatherforecastapp.util.formatDate
+import com.study.weatherforecastapp.util.formatDecimal
 
 @Composable
 fun MainScreen(navController: NavHostController, viewModel: MainViewModel = hiltViewModel()) {
     val weatherData = produceState<DataOrException<Weather, Boolean, Exception>>(
         initialValue = DataOrException(loading = true), producer = {
-            value = viewModel.getWeatherData("natal")
+            value = viewModel.getWeatherData(city = "natal", units = "metric")
         }
     ).value
 
@@ -54,7 +56,8 @@ fun MainScaffold(weather: Weather, navController: NavController) {
 
 @Composable
 fun MainContent(weather: Weather) {
-    val imageUrl = "${Constants.IMG_BASE_URL}${weather.list.first().weather.first().icon}.png"
+    val weatherItem = weather.list.first()
+
     Column(
         modifier = Modifier
             .padding(4.dp)
@@ -63,7 +66,7 @@ fun MainContent(weather: Weather) {
         horizontalAlignment = Alignment.CenterHorizontally
         ) {
         Text(
-            text = "Nov 29, Mon",
+            text = formatDate(weather.list.first().dt),
             style = MaterialTheme.typography.caption,
             color = MaterialTheme.colors.onSecondary,
             fontWeight = FontWeight.SemiBold,
@@ -80,14 +83,14 @@ fun MainContent(weather: Weather) {
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                    WeatherStateImage(imageUrl)
+                    WeatherStateImage(icon = weatherItem.weather.first().icon)
                     Text(
-                        text = "54",
+                        text = "${formatDecimal(weatherItem.temp.day)}º",
                         style = MaterialTheme.typography.h4,
                         fontWeight = FontWeight.ExtraBold
                     )
                     Text(
-                        text = "Rain",
+                        text = weatherItem.weather.first().main,
                         fontStyle = FontStyle.Italic
                     )
                 }
@@ -97,7 +100,8 @@ fun MainContent(weather: Weather) {
 }
 
 @Composable
-fun WeatherStateImage(imageUrl: String) {
+fun WeatherStateImage(icon: String) {
+    val imageUrl = "${Constants.IMG_BASE_URL}${icon}.png"
     AsyncImage(
         model = imageUrl,
         contentDescription = "Weather representation icon",
