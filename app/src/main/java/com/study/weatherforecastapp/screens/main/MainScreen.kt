@@ -2,7 +2,11 @@ package com.study.weatherforecastapp.screens.main
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
@@ -13,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -22,10 +27,7 @@ import com.study.weatherforecastapp.components.WeatherAppBar
 import com.study.weatherforecastapp.data.DataOrException
 import com.study.weatherforecastapp.model.Weather
 import com.study.weatherforecastapp.model.WeatherItem
-import com.study.weatherforecastapp.util.Constants
-import com.study.weatherforecastapp.util.formatDate
-import com.study.weatherforecastapp.util.formatDateTime
-import com.study.weatherforecastapp.util.formatDecimal
+import com.study.weatherforecastapp.util.*
 
 @Composable
 fun MainScreen(navController: NavHostController, viewModel: MainViewModel = hiltViewModel()) {
@@ -80,7 +82,8 @@ fun MainContent(weather: Weather) {
                 .padding(4.dp)
                 .size(200.dp),
             shape = CircleShape,
-            color = Color(0xFFFFC400)
+            color = AppColors.Yellow,
+            elevation = 5.dp
         ) {
                 Column(
                     verticalArrangement = Arrangement.Center,
@@ -103,6 +106,57 @@ fun MainContent(weather: Weather) {
         HumidityWindPressureRow(weather = weatherItem)
         Divider()
         SunTimeRow(weather = weatherItem)
+        Text(text = "This Week", style = MaterialTheme.typography.subtitle1, fontWeight = FontWeight.Bold)
+        ForecastList(weather.list)
+    }
+}
+
+@Composable
+fun ForecastList(items: List<WeatherItem>) {
+    Surface(
+        color = AppColors.LightGray,
+        shape = RoundedCornerShape(15.dp)
+    ) {
+        LazyColumn(
+            modifier = Modifier.padding(horizontal = 2.dp, vertical = 1.dp),
+            content = {
+            items(items) { item ->
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(3.dp),
+                    color = Color.White,
+                    shape = CircleShape.copy(topEnd = CornerSize(2.dp))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 3.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = formatDate(item.dt).subSequence(0, 3).toString())
+                        WeatherStateImage(icon = item.weather.first().icon)
+                        Surface(
+                            color = AppColors.Yellow,
+                            shape = CircleShape
+                        ) {
+                            Text(
+                                text = item.weather.first().description,
+                                modifier = Modifier
+                                    .padding(vertical = 2.dp, horizontal = 4.dp),
+                                style = MaterialTheme.typography.caption
+                            )
+                        }
+                        Row {
+                            Text(text = "${formatDecimal(item.temp.max)}º", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color.Blue.copy(alpha = 0.7f))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(text = "${formatDecimal(item.temp.min)}º", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color.LightGray)
+                        }
+                    }
+                }
+            }
+        })
     }
 }
 
@@ -168,7 +222,9 @@ fun SunTimeItem(icon: Int, time: String, iconFirst: Boolean = true) {
         modifier = Modifier.padding(4.dp),
     ) {
         Text(text = time, style = MaterialTheme.typography.caption)
-        Icon(painter = painterResource(id = icon), contentDescription = "Sun time icon", modifier = Modifier.size(25.dp).padding(4.dp))
+        Icon(painter = painterResource(id = icon), contentDescription = "Sun time icon", modifier = Modifier
+            .size(25.dp)
+            .padding(4.dp))
     }
 
 }
