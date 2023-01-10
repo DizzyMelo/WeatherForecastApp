@@ -25,10 +25,14 @@ import com.study.weatherforecastapp.widgets.SunTimeRow
 import com.study.weatherforecastapp.widgets.WeatherStateImage
 
 @Composable
-fun MainScreen(navController: NavHostController, viewModel: MainViewModel = hiltViewModel()) {
+fun MainScreen(
+    navController: NavHostController,
+    viewModel: MainViewModel = hiltViewModel(),
+    city: String? = "natal"
+) {
     val weatherData = produceState<DataOrException<Weather, Boolean, Exception>>(
         initialValue = DataOrException(loading = true), producer = {
-            value = viewModel.getWeatherData(city = "natal", units = "metric")
+            value = viewModel.getWeatherData(city = city!!, units = "metric")
         }
     ).value
 
