@@ -6,19 +6,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.study.weatherforecastapp.model.Favorite
 import com.study.weatherforecastapp.navigation.AppScreens
+import com.study.weatherforecastapp.screens.favorite.FavoriteViewModel
 
 @Composable
 fun WeatherAppBar(
@@ -27,6 +29,7 @@ fun WeatherAppBar(
     isMainScreen: Boolean = true,
     elevation: Dp = 5.dp,
     navController: NavController,
+    favoriteViewModel: FavoriteViewModel = hiltViewModel(),
     onAddActionClicked: () -> Unit = {},
     onButtonClicked: () -> Unit = {}
 ) {
@@ -53,6 +56,24 @@ fun WeatherAppBar(
                      )
                  }
              }
+
+            if (isMainScreen) {
+                val splitTitle = title.split(",")
+                Icon(
+                    imageVector = Icons.Default.FavoriteBorder,
+                    contentDescription = "Favorite icon",
+                    modifier = Modifier
+                        .scale(0.9f)
+                        .clickable {
+                            favoriteViewModel.addFavorite(
+                                Favorite(
+                                    city = splitTitle[0].trim(),
+                                    country = splitTitle[1].trim()
+                                )
+                            )
+                        }
+                )
+            }
         },
         actions = {
             if (isMainScreen) {
