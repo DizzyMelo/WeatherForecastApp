@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.study.weatherforecastapp.components.WeatherAppBar
+import com.study.weatherforecastapp.navigation.AppScreens
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -46,6 +47,14 @@ fun SearchScreen(navController: NavController) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                SearchBar(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.CenterHorizontally)
+                ) {
+                    navController.navigate(route = "${AppScreens.MainScreen.name}/$it")
+                }
             }
         }
     }
@@ -53,20 +62,27 @@ fun SearchScreen(navController: NavController) {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SearchBar(onSearch: (String) -> Unit = {}) {
+fun SearchBar(modifier: Modifier = Modifier, onSearch: (String) -> Unit = {}) {
     val searchQueryState = rememberSaveable {
         mutableStateOf("")
     }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val validState = remember(searchQueryState.value) {
+    val isValid = remember(searchQueryState.value) {
         searchQueryState.value.trim().isNotEmpty()
     }
 
     Column {
         CommonTextField(
             valueState = searchQueryState,
-            label = "Natal",
-            onAction = KeyboardActions {}
+            label = "City",
+            onAction = KeyboardActions {
+                if(!isValid) {
+                    return@KeyboardActions
+                }
+                onSearch(searchQueryState.value.trim())
+                searchQueryState.value = ""
+                keyboardController?.hide()
+            }
         )
     }
 }
