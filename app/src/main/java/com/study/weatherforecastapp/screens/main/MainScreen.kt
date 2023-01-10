@@ -17,6 +17,7 @@ import androidx.navigation.NavHostController
 import com.study.weatherforecastapp.components.WeatherAppBar
 import com.study.weatherforecastapp.data.DataOrException
 import com.study.weatherforecastapp.model.Weather
+import com.study.weatherforecastapp.navigation.AppScreens
 import com.study.weatherforecastapp.util.*
 import com.study.weatherforecastapp.widgets.ForecastList
 import com.study.weatherforecastapp.widgets.HumidityWindPressureRow
@@ -45,6 +46,9 @@ fun MainScaffold(weather: Weather, navController: NavController) {
         WeatherAppBar(
             title = "${weather.city.name}, ${weather.city.country}",
             navController = navController,
+            onAddActionClicked = {
+                navController.navigate(route = AppScreens.SearchScreen.name)
+            }
         ){
 
         }
