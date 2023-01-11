@@ -1,7 +1,6 @@
 package com.study.weatherforecastapp.screens.favorite
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,13 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.study.weatherforecastapp.components.WeatherAppBar
 import com.study.weatherforecastapp.model.Favorite
 import com.study.weatherforecastapp.navigation.AppScreens
 import com.study.weatherforecastapp.util.AppColors
-import kotlinx.coroutines.flow.toList
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
