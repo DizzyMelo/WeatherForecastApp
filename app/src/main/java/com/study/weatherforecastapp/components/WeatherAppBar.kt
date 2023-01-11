@@ -77,7 +77,7 @@ fun WeatherAppBar(
                         .clickable {
                             if (!isAlreadyFavorite) {
                                 favoriteViewModel.addFavorite(favorite).run {
-                                    Toast.makeText(context, "Added to fav", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Added to favorite list", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         },
