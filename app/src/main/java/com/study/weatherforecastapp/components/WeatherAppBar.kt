@@ -1,5 +1,6 @@
 package com.study.weatherforecastapp.components
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -37,6 +39,8 @@ fun WeatherAppBar(
         mutableStateOf(false)
     }
 
+    val context = LocalContext.current
+
     if (showDropButtons.value) {
         ShowSettingsDropDownMenu(showDropButtons = showDropButtons, navController = navController)
     }
@@ -59,19 +63,25 @@ fun WeatherAppBar(
 
             if (isMainScreen) {
                 val splitTitle = title.split(",")
+                val favorite = Favorite(city = splitTitle[0].trim(), country = splitTitle[1].trim())
+                val isAlreadyFavorite = favoriteViewModel.favorites
+                    .collectAsState()
+                    .value
+                    .contains(favorite)
+
                 Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
+                    imageVector = if (isAlreadyFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = "Favorite icon",
                     modifier = Modifier
                         .scale(0.9f)
                         .clickable {
-                            favoriteViewModel.addFavorite(
-                                Favorite(
-                                    city = splitTitle[0].trim(),
-                                    country = splitTitle[1].trim()
-                                )
-                            )
-                        }
+                            if (!isAlreadyFavorite) {
+                                favoriteViewModel.addFavorite(favorite).run {
+                                    Toast.makeText(context, "Added to fav", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        },
+                    tint = if (isAlreadyFavorite) Color.Red else Color.Black
                 )
             }
         },
