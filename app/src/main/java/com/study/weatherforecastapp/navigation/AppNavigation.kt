@@ -14,13 +14,14 @@ import com.study.weatherforecastapp.screens.main.MainScreen
 import com.study.weatherforecastapp.screens.main.MainViewModel
 import com.study.weatherforecastapp.screens.search.SearchScreen
 import com.study.weatherforecastapp.screens.settings.SettingsScreen
+import com.study.weatherforecastapp.screens.settings.SettingsViewModel
 import com.study.weatherforecastapp.screens.splash.SplashScreen
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = AppScreens.SplashScreen.name ) {
+    NavHost(navController = navController, startDestination = AppScreens.SplashScreen.name) {
         composable(route = AppScreens.SplashScreen.name) {
             SplashScreen(navController = navController)
         }
@@ -32,11 +33,18 @@ fun AppNavigation() {
                 navArgument(name = "city", builder = {
                     type = NavType.StringType
                 })
-            )) { navBackStackEntry ->
+            )
+        ) { navBackStackEntry ->
 
             navBackStackEntry.arguments?.getString("city").let {
                 val mainViewModel = hiltViewModel<MainViewModel>()
-                MainScreen(navController = navController, mainViewModel = mainViewModel, city = it)
+                val settingsViewModel = hiltViewModel<SettingsViewModel>()
+                MainScreen(
+                    navController = navController,
+                    mainViewModel = mainViewModel,
+                    settingsViewModel = settingsViewModel,
+                    city = it
+                )
             }
         }
 

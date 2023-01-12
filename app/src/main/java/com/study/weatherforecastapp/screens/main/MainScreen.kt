@@ -7,9 +7,13 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -23,6 +27,7 @@ import com.study.weatherforecastapp.widgets.ForecastList
 import com.study.weatherforecastapp.widgets.HumidityWindPressureRow
 import com.study.weatherforecastapp.widgets.SunTimeRow
 import com.study.weatherforecastapp.widgets.WeatherStateImage
+import com.study.weatherforecastapp.model.Unit
 
 @Composable
 fun MainScreen(
@@ -35,9 +40,13 @@ fun MainScreen(
     var unit by remember {
         mutableStateOf(Constants.IMPERIAL_UNIT)
     }
+    var symbol by remember {
+        mutableStateOf("F")
+    }
 
     if (unitFromDb.isNotEmpty()) {
         unit = unitFromDb.first().unit
+        symbol = unitFromDb.first().symbol
     }
 
     val weatherData = produceState<DataOrException<Weather, Boolean, Exception>>(
@@ -49,13 +58,14 @@ fun MainScreen(
     if (weatherData.loading == true) {
         CircularProgressIndicator()
     } else if (weatherData.data != null) {
-        MainScaffold(weather = weatherData.data!!, navController = navController, unit = unit)
+        val unitObject = Unit(unit, symbol)
+        MainScaffold(weather = weatherData.data!!, navController = navController, unit = unitObject)
     }
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MainScaffold(weather: Weather, navController: NavController, unit: String) {
+fun MainScaffold(weather: Weather, navController: NavController, unit: Unit) {
     Scaffold(topBar = {
         WeatherAppBar(
             title = "${weather.city.name}, ${weather.city.country}",
@@ -72,7 +82,7 @@ fun MainScaffold(weather: Weather, navController: NavController, unit: String) {
 }
 
 @Composable
-fun MainContent(weather: Weather, unit: String) {
+fun MainContent(weather: Weather, unit: Unit) {
     val weatherItem = weather.list.first()
 
     Column(
@@ -103,10 +113,22 @@ fun MainContent(weather: Weather, unit: String) {
                     ) {
                     WeatherStateImage(icon = weatherItem.weather.first().icon)
                     Text(
-                        text = "${formatDecimal(weatherItem.temp.day)}º",
-                        style = MaterialTheme.typography.h4,
-                        fontWeight = FontWeight.ExtraBold
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 30.sp
+                            )) {
+                                append("${formatDecimal(weatherItem.temp.day)}º")
+                            }
+                            withStyle(style = SpanStyle(
+                                fontSize = 17.sp
+                            )) {
+                                append(unit.symbol)
+                            }
+                        }
                     )
+
+                    //"${formatDecimal(weatherItem.temp.day)}º ${unit.symbol}"
                     Text(
                         text = weatherItem.weather.first().main,
                         fontStyle = FontStyle.Italic
@@ -115,7 +137,7 @@ fun MainContent(weather: Weather, unit: String) {
             
         }
 
-        HumidityWindPressureRow(weather = weatherItem, unit = unit)
+        HumidityWindPressureRow(weather = weatherItem, unit = unit.unit)
         Divider()
         SunTimeRow(weather = weatherItem)
         Text(text = "This Week", style = MaterialTheme.typography.subtitle1, fontWeight = FontWeight.Bold)
