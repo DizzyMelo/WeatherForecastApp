@@ -4,8 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
@@ -18,6 +17,7 @@ import com.study.weatherforecastapp.components.WeatherAppBar
 import com.study.weatherforecastapp.data.DataOrException
 import com.study.weatherforecastapp.model.Weather
 import com.study.weatherforecastapp.navigation.AppScreens
+import com.study.weatherforecastapp.screens.settings.SettingsViewModel
 import com.study.weatherforecastapp.util.*
 import com.study.weatherforecastapp.widgets.ForecastList
 import com.study.weatherforecastapp.widgets.HumidityWindPressureRow
@@ -27,25 +27,35 @@ import com.study.weatherforecastapp.widgets.WeatherStateImage
 @Composable
 fun MainScreen(
     navController: NavHostController,
-    viewModel: MainViewModel = hiltViewModel(),
+    mainViewModel: MainViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
     city: String? = "natal"
 ) {
+    val unitFromDb = settingsViewModel.units.collectAsState().value
+    var unit by remember {
+        mutableStateOf(Constants.IMPERIAL_UNIT)
+    }
+
+    if (unitFromDb.isNotEmpty()) {
+        unit = unitFromDb.first().unit
+    }
+
     val weatherData = produceState<DataOrException<Weather, Boolean, Exception>>(
         initialValue = DataOrException(loading = true), producer = {
-            value = viewModel.getWeatherData(city = city!!, units = "metric")
+            value = mainViewModel.getWeatherData(city = city!!, units = unit)
         }
     ).value
 
     if (weatherData.loading == true) {
         CircularProgressIndicator()
     } else if (weatherData.data != null) {
-        MainScaffold(weather = weatherData.data!!, navController = navController)
+        MainScaffold(weather = weatherData.data!!, navController = navController, unit = unit)
     }
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MainScaffold(weather: Weather, navController: NavController) {
+fun MainScaffold(weather: Weather, navController: NavController, unit: String) {
     Scaffold(topBar = {
         WeatherAppBar(
             title = "${weather.city.name}, ${weather.city.country}",
@@ -57,12 +67,12 @@ fun MainScaffold(weather: Weather, navController: NavController) {
 
         }
     }) {
-        MainContent(weather = weather)
+        MainContent(weather = weather, unit = unit)
     }
 }
 
 @Composable
-fun MainContent(weather: Weather) {
+fun MainContent(weather: Weather, unit: String) {
     val weatherItem = weather.list.first()
 
     Column(
@@ -105,7 +115,7 @@ fun MainContent(weather: Weather) {
             
         }
 
-        HumidityWindPressureRow(weather = weatherItem)
+        HumidityWindPressureRow(weather = weatherItem, unit = unit)
         Divider()
         SunTimeRow(weather = weatherItem)
         Text(text = "This Week", style = MaterialTheme.typography.subtitle1, fontWeight = FontWeight.Bold)
