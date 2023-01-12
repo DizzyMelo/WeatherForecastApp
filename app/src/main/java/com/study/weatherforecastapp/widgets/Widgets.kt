@@ -83,7 +83,7 @@ fun WeatherStateImage(icon: String) {
 }
 
 @Composable
-fun HumidityWindPressureRow(weather: WeatherItem) {
+fun HumidityWindPressureRow(weather: WeatherItem, unit: String) {
     Row(
         modifier = Modifier
             .padding(12.dp)
@@ -93,7 +93,7 @@ fun HumidityWindPressureRow(weather: WeatherItem) {
     ) {
         HWPItem(icon = R.drawable.humidity, amount = weather.humidity.toString(), unit = "%")
         HWPItem(icon = R.drawable.pressure, amount = weather.pressure.toString(), unit = "psi")
-        HWPItem(icon = R.drawable.wind, amount = weather.speed.toString(), unit = " mph")
+        HWPItem(icon = R.drawable.wind, amount = weather.speed.toString(), unit = if (unit == Constants.IMPERIAL_UNIT) " mph" else " m/s")
     }
 }
 
