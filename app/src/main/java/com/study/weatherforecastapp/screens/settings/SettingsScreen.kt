@@ -20,6 +20,7 @@ import androidx.navigation.NavController
 import com.study.weatherforecastapp.components.WeatherAppBar
 import com.study.weatherforecastapp.model.Unit
 import com.study.weatherforecastapp.util.AppColors
+import com.study.weatherforecastapp.util.Constants
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -27,8 +28,9 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
     var unitToggleState by remember {
         mutableStateOf(false)
     }
-    val imperial = "Imperial (F)"
-    val metric = "Metric (C)"
+    val imperial = Constants.IMPERIAL_UNIT
+    val metric = Constants.METRIC_UNIT
+    val unitSymbol = hashMapOf(imperial to "F", metric to "C")
     val choiceFromDb = viewModel.units.collectAsState().value
 
     val defaultChoice = if (choiceFromDb.isEmpty()) imperial else choiceFromDb.first().unit
@@ -81,7 +83,7 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
                 Button(
                     onClick = {
                         viewModel.deleteAllUnits()
-                        viewModel.addUnit(Unit(unit = choiceState.ifEmpty { imperial }))
+                        viewModel.addUnit(Unit(unit = choiceState, symbol = unitSymbol[choiceState]!!))
                     },
                     modifier = Modifier
                         .padding(3.dp)
