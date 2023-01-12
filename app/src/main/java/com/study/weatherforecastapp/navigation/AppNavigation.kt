@@ -36,7 +36,7 @@ fun AppNavigation() {
 
             navBackStackEntry.arguments?.getString("city").let {
                 val mainViewModel = hiltViewModel<MainViewModel>()
-                MainScreen(navController = navController, viewModel = mainViewModel, city = it)
+                MainScreen(navController = navController, mainViewModel = mainViewModel, city = it)
             }
         }
 
